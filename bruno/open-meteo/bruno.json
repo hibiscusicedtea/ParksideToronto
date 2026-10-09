@@ -1,0 +1,6 @@
+{
+  "version": "1",
+  "name": "Open-Meteo",
+  "type": "collection",
+  "ignore": ["node_modules", ".git"]
+}

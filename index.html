@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f5ef" />
+  <meta name="description" content="Explore Toronto parks, amenities, and local weather." />
+  <title>Parkside Toronto — Find your green space</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css" integrity="sha384-gNYNsUmuZqDYiT3gbirWTV5K7rt71RoveS/yXAaU09d4ZUmeDVTD3XoqB6uJAIFR" crossorigin="anonymous" />
+  <link rel="stylesheet" href="design.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Parkside Toronto home">
+      <span class="brand-mark" data-feather="map"></span>
+      <span>Parkside<span class="brand-city"> / TORONTO</span></span>
+    </a>
+
+    <nav aria-label="Main navigation">
+      <a class="nav-link active" href="#explore" aria-current="location">Explore</a>
+      <a class="nav-link" href="#how-it-works">About</a>
+    </nav>
+
+    <button id="location-button" class="location-button" type="button">
+      <span class="pin" data-feather="map-pin" aria-hidden="true"></span>
+      <span>Use my location</span>
+    </button>
+  </header>
+
+  <main id="top">
+    <section class="hero" id="explore">
+      <div class="hero-copy">
+        <p class="eyebrow">
+          <span class="eyebrow-dot" data-feather="sun" aria-hidden="true"></span>
+          TORONTO CITY, A LITTLE GREENER
+        </p>
+
+        <h1>Find your<br /><em>outside.</em></h1>
+
+        <p class="hero-desc">
+          A quieter corner, a place to play, a trail to wander. Find the Toronto park that fits your day.
+        </p>
+
+        <div class="search-wrap">
+          <span class="search-icon" data-feather="search" aria-hidden="true"></span>
+          <label class="visually-hidden" for="search-input">
+            Search parks, addresses, or amenities
+          </label>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Search parks, addresses, amenities…"
+            autocomplete="off"
+          />
+          <kbd>⌘ K</kbd>
+        </div>
+
+        <div class="search-note">
+          <span class="sparkle" data-feather="sun" aria-hidden="true"></span>
+          <span id="count-note">Loading Toronto parks…</span>
+        </div>
+      </div>
+
+      <div class="hero-art">
+        <img
+          class="hero-photo"
+          src="https://upload.wikimedia.org/wikipedia/commons/4/41/Toronto-_High_Park_Grenadier_Pond_%2817083492547%29.jpg"
+          alt="Grenadier Pond in High Park, Toronto"
+        />
+        <div class="art-label">
+          <span>HIGH PARK · TORONTO</span>
+          <a href="https://commons.wikimedia.org/wiki/File:Toronto-_High_Park_Grenadier_Pond_(17083492547).jpg" target="_blank" rel="noreferrer">THE CITY OF TORONTO · CC BY 2.0</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace" aria-label="Park finder">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow section-eyebrow">MAKE A DAY OF IT</p>
+          <h2>Explore parks</h2>
+        </div>
+
+        <div class="sort-control">
+          <label class="visually-hidden" for="sort-select">Sort parks</label>
+          <div class="sort-select-wrap">
+            <span data-feather="sliders" aria-hidden="true"></span>
+            <select id="sort-select">
+              <option value="name">Name</option>
+              <option value="amenities">Most amenities</option>
+              <option value="distance">Nearest to me</option>
+            </select>
+            <span data-feather="chevron-down" aria-hidden="true"></span>
+          </div>
+          <p class="sort-status" id="sort-status" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="filters" id="filters" aria-label="Filter by amenity">
+        <button class="filter-chip selected" data-filter="all" type="button">
+          <span data-feather="map"></span>
+          All parks <span id="all-count">—</span>
+        </button>
+        <button class="filter-chip" data-filter="Playground" type="button"><span data-feather="smile"></span> Playground</button>
+        <button class="filter-chip" data-filter="open-space" type="button"><span data-feather="map"></span> Open green space</button>
+        <button class="filter-chip" data-filter="Picnic Site" type="button"><span data-feather="sun"></span> Picnic spots</button>
+        <button class="filter-chip" data-filter="Basketball Court" type="button"><span data-feather="activity"></span> Sports</button>
+        <button class="filter-chip" data-filter="Washroom" type="button"><span data-feather="droplet"></span> Washrooms</button>
+      </div>
+
+      <div class="content-grid">
+        <div class="results-column">
+          <div class="results-meta">
+            <span id="results-count">Loading parks…</span>
+            <span class="live-indicator"><i></i> TORONTO PARKS DATA</span>
+          </div>
+
+          <div id="park-list" class="park-list" aria-live="polite"></div>
+
+          <div id="empty-state" class="empty-state" hidden>
+            <span class="empty-icon" data-feather="search" aria-hidden="true"></span>
+            <h3>No parks found</h3>
+            <p>Try another name or remove a filter.</p>
+            <button id="clear-search" class="text-button" type="button">
+              <span data-feather="rotate-ccw" aria-hidden="true"></span>
+              Clear search and filters
+            </button>
+          </div>
+
+          <button id="load-more" class="load-more" type="button">
+            Show more parks <span data-feather="chevron-down" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <button id="detail-backdrop" class="detail-backdrop" type="button" aria-label="Close park details" hidden></button>
+
+        <aside class="detail-panel" id="detail-panel" aria-label="Selected park details">
+          <div class="detail-top">
+            <span class="detail-kicker">YOUR PARK PICK</span>
+            <button id="close-detail" class="icon-button" type="button" aria-label="Close park details">
+              <span data-feather="x" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div id="detail-content" class="detail-content">
+            <div class="detail-illustration">
+              <img
+                class="detail-photo"
+                src="https://upload.wikimedia.org/wikipedia/commons/4/41/Toronto-_High_Park_Grenadier_Pond_%2817083492547%29.jpg"
+                alt="Grenadier Pond in High Park, Toronto"
+              />
+              <div class="photo-caption">
+                <span>HIGH PARK · TORONTO</span>
+                <a href="https://commons.wikimedia.org/wiki/File:Toronto-_High_Park_Grenadier_Pond_(17083492547).jpg" target="_blank" rel="noreferrer">THE CITY OF TORONTO · CC BY 2.0</a>
+              </div>
+            </div>
+
+            <div class="detail-placeholder">
+              <span class="mini-spark" data-feather="map-pin" aria-hidden="true"></span>
+              <h3>Your next favourite<br />place is out there.</h3>
+              <p>Choose a park to see its amenities, local weather, and map location.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="how-section" id="how-it-works">
+      <div>
+        <p class="eyebrow section-eyebrow">A GOOD DAY STARTS SOMEWHERE</p>
+        <h2>From “where to?”<br /><em>to “let’s go.”</em></h2>
+      </div>
+
+      <div class="how-cards">
+        <article>
+          <span>01</span>
+          <h3>Find your kind of park</h3>
+          <p>Search by name or amenity to find your kind of park.</p>
+        </article>
+
+        <article>
+          <span>02</span>
+          <h3>Check the local weather</h3>
+          <p>Check local conditions before you head out.</p>
+        </article>
+
+        <article>
+          <span>03</span>
+          <h3>Plan your visit</h3>
+          <p>Open a map and plan your visit.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <a class="brand footer-brand" href="#top">
+      <span class="brand-mark" data-feather="map"></span>
+      <span>Parkside</span>
+    </a>
+    <span>Made for the way Toronto gets outside.</span>
+    <a href="https://www.toronto.ca/explore-enjoy/parks-recreation/" target="_blank" rel="noreferrer">
+      City of Toronto Parks <span data-feather="external-link" aria-hidden="true"></span>
+    </a>
+  </footer>
+
+  <script src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js" integrity="sha384-1qC0PnXk2fgMDybOtZF1ui4LM5Sxm7o0TbEkwfxTTVdlZvuNENNGCKUub7d644HP" crossorigin="anonymous" defer></script>
+  <script src="https://unpkg.com/feather-icons@4.29.2/dist/feather.min.js" integrity="sha384-qEqAs1VsN9WH2myXDbiP2wGGIttL9bMRZBKCl54ZnzpDlVqbYANP9vMaoT/wvQcf" crossorigin="anonymous" defer></script>
+  <script src="sketch.js" defer></script>
+</body>
+</html>

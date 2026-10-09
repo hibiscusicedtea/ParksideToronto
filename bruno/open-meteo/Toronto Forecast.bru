@@ -1,0 +1,26 @@
+meta {
+  name: Toronto Forecast
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://api.open-meteo.com/v1/forecast
+  body: none
+  auth: none
+}
+
+params:query {
+  latitude: 43.6532
+  longitude: -79.3832
+  current: temperature_2m,apparent_temperature,precipitation,wind_speed_10m,weather_code
+  daily: temperature_2m_max,temperature_2m_min,precipitation_probability_max
+  temperature_unit: celsius
+  wind_speed_unit: kmh
+  precipitation_unit: mm
+  timezone: auto
+}
+
+headers {
+  Accept: application/json
+}
